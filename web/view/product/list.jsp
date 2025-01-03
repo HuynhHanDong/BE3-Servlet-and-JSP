@@ -37,8 +37,14 @@
                     }
                 %>
                 <option value="<%=""%>"><%= "All categories"%></option>
-
             </select>
+                
+            <label>Min Price:</label>
+            <input type="number" name="minPrice" value="${requestScope.minPrice}" step="0.01">
+
+            <label>Max Price:</label>
+            <input type="number" name="maxPrice" value="${requestScope.maxPrice}" step="0.01">
+            
             <input type="submit" value="search">
         </form>
 

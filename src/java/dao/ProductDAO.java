@@ -21,7 +21,7 @@ import utils.DBUtils;
  */
 public class ProductDAO {
 
-    private String constructSearchQuery(String productName, Integer categoryId) {
+    private String constructSearchQuery(String productName, Integer categoryId, Float minPrice, Float maxPrice) {
         String sql = " SELECT p.id, p.name, p.price, p.product_year, p.image, p.category_id, c.name as category_name "
                 + " from Product p join Category c on p.category_id = c.id where 1 = 1 ";
         if (categoryId != null) {
@@ -30,13 +30,18 @@ public class ProductDAO {
         if (productName != null && !productName.trim().isEmpty()) {
             sql += " and p.name like ? ";
         }
-
+        if (minPrice != null) {
+            sql += " and p.price >= ? ";
+        }
+        if (maxPrice != null) {
+            sql += " and p.price <= ? ";
+        }
         return sql;
     }
 
-    public List<Product> list(String productName, Integer categoryId) {
+    public List<Product> list(String productName, Integer categoryId, Float minPrice, Float maxPrice) {
         List<Product> list = null;
-        String sql = constructSearchQuery(productName, categoryId);
+        String sql = constructSearchQuery(productName, categoryId, minPrice, maxPrice);
         try {
             Connection con = DBUtils.getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
@@ -46,9 +51,14 @@ public class ProductDAO {
             if (categoryId != null) {
                 ps.setInt(paramIndex++, categoryId);
             }
-            if (productName != null
-                    && !productName.trim().isEmpty()) {
+            if (productName != null && !productName.trim().isEmpty()) {
                 ps.setString(paramIndex++, "%" + productName + "%");
+            }
+            if (minPrice != null) {
+                ps.setFloat(paramIndex++, minPrice);
+            }
+            if (maxPrice != null) {
+                ps.setFloat(paramIndex++, maxPrice);
             }
 
             ResultSet rs = ps.executeQuery();

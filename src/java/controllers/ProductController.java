@@ -82,17 +82,27 @@ public class ProductController extends HttpServlet {
             // get search criterias
             String categoryIdRaw = request.getParameter("category");
             String productName = request.getParameter("productName");
+            String minPriceRaw = request.getParameter("minPrice");
+            String maxPriceRaw = request.getParameter("maxPrice");
 
             // validate search fields only when search criterias a string
             Integer categoryId = null;
+            Float minPrice = null;
+            Float maxPrice = null;
             if (categoryIdRaw != null && !categoryIdRaw.isEmpty()) {
                 SearchProductDTO searchDTO = new SearchProductDTO(categoryIdRaw, productName);
                 searchDTO.validate();
                 categoryId = Integer.parseInt(categoryIdRaw);
             }
+            if (minPriceRaw != null && !minPriceRaw.isEmpty()) {
+                minPrice = Float.parseFloat(minPriceRaw);
+            }
+            if (maxPriceRaw != null && !maxPriceRaw.isEmpty()) {
+                maxPrice = Float.parseFloat(maxPriceRaw);
+            }
 
             // get search data
-            List<Product> list = productDAO.list(productName, categoryId);
+            List<Product> list = productDAO.list(productName, categoryId,minPrice, maxPrice);
             if (list != null && !list.isEmpty()) {
                 request.setAttribute("products", list);
             } else {
@@ -102,6 +112,8 @@ public class ProductController extends HttpServlet {
             // hold search criteria on search bar for next request
             request.setAttribute("productName", productName);
             request.setAttribute("category", categoryIdRaw);
+            request.setAttribute("minPrice", minPriceRaw);
+            request.setAttribute("maxPrice", maxPriceRaw);
 
         }
 //      catch (ValidationException ex) {

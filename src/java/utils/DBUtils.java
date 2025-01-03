@@ -15,8 +15,8 @@ import java.sql.SQLException;
  */
 public class DBUtils {
     private static final String DB_NAME = "MvcDemo";
-    private static final String DB_USER_NAME = "SA";
-    private static final String DB_PASSWORD = "sa123456"; // cac ban nen de la 12345 vi de PE de vay
+    private static final String DB_USER_NAME = "sa";
+    private static final String DB_PASSWORD = "123123123"; // cac ban nen de la 12345 vi de PE de vay
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
         Connection conn = null;
