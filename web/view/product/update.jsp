@@ -1,9 +1,9 @@
 <%-- 
-    Document   : create
-    Created on : Dec 27, 2024, 6:36:23 PM
-    Author     : vothimaihoa
+    Document   : update
+    Created on : Jan 4, 2025, 3:21:04 AM
+    Author     : Huynh Han Dong
 --%>
-
+<%@page import="entities.Product"%>
 <%@page import="java.util.List"%>
 <%@page import="entities.Category"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -11,28 +11,31 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Create Product</title>
+        <title>Update product</title>
     </head>
     <body>
-        <h1>Add New Product</h1>
+        <h1>Update Product</h1>
         <%
             String error = (String) request.getAttribute("msg");
+            Product product = (Product) request.getAttribute("product");
             if (error != null) { 
         %>
         <p><%=error%></p>
         <% } %>
         <form action="Product" method="POST">
+            <input type="hidden" name="productId" value="${product.getId()}">
+
             <label for="name">Product Name:</label>
-            <input type="text" id="name" name="name" required><br><br>
+            <input type="text" id="name" name="name" value="${product.name} " required><br><br>
 
             <label for="price">Price:</label>
-            <input type="number" id="price" name="price" step="0.01" required><br><br>
+            <input type="number" id="price" name="price" step="0.01" value="${product.price}" required><br><br>
 
             <label for="productYear">Product Year:</label>
-            <input type="number" id="productYear" name="productYear" required><br><br>
+            <input type="number" id="productYear" name="productYear" value="${product.productYear}" required><br><br>
 
             <label for="image">Image URL:</label>
-            <input type="text" id="image" name="image"><br><br>
+            <input type="text" id="image" name="image" value="${product.image}" ><br><br>
 
             <label for="category">Category:</label>
             <select id="category" name="category" required>
@@ -40,15 +43,16 @@
                     List<Category> categories = (List<Category>) request.getAttribute("categories");
                     if (categories != null) {
                         for (Category category : categories) {
+                            String selected = (category.getId() == product.getCategory().getId()) ? "selected" : "";
                 %>
-                <option value="<%= category.getId()%>"><%= category.getName()%></option>
+                <option value="<%= category.getId()%>" <%= selected%>><%= category.getName()%></option>
                 <%
                         }
                     }
                 %>
             </select><br><br>
-            <input type="hidden" name="action" value="add"> <!-- parameter action to handle add new product-->
-            <button type="submit">Add Product</button>
+            <input type="hidden" name="action" value="update">
+            <button type="submit">Update Product</button>
         </form>
     </body>
 </html>

@@ -146,4 +146,51 @@ public class ProductDAO {
         }
         return status;
     }
+    
+    public boolean update(Product product) {
+        boolean status = false;
+        String sql = "UPDATE Product SET name=?, price=?, product_year=?, image=?, category_id=? WHERE id=?";
+
+        try {
+            Connection con = DBUtils.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, product.getName());
+            ps.setFloat(2, product.getPrice());
+            ps.setInt(3, product.getProductYear());
+            ps.setString(4, product.getImage());
+            ps.setInt(5, product.getCategory().getId());
+            ps.setInt(6, product.getId());
+
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                status = true;
+            }
+            con.close();
+        } catch (ClassNotFoundException | SQLException ex) {
+            System.out.println("SQL Exception in updating product. Details: ");
+            ex.printStackTrace();
+        }
+        return status;
+    }
+
+    public boolean delete(int id) {
+        boolean status = false;
+        String sql = "DELETE FROM Product WHERE id=?";
+
+        try {
+            Connection con = DBUtils.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                status = true;
+            }
+            con.close();
+        } catch (ClassNotFoundException | SQLException ex) {
+            System.out.println("SQL Exception in deleting product. Details: ");
+            ex.printStackTrace();
+        }
+        return status;
+    }
 }

@@ -52,8 +52,9 @@ public class AccountDAO {
         String sql = " SELECT id, username, role "
                 + " from Account a "
                 + " where username = ? AND password = ?";
-        try (Connection con = DBUtils.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)){
+        try {
+            Connection con = DBUtils.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, username);
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();

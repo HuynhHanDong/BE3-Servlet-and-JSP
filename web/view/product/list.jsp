@@ -80,6 +80,20 @@
                 <td><%= p.getProductYear()%></td>
                 <td><img src="<%= p.getImage()%>" alt="product image" width="100" height="100"></td>
                 <td><%= p.getCategory().getName()%></td>
+                <td>
+                    <form action="Product" method="GET">
+                        <input type="hidden" name="action" value="prepare-update">
+                        <input type="hidden" name="productId" value="<%= p.getId()%>">
+                        <button type="submit">Edit</button>
+                    </form>
+                </td> 
+                <td>
+                    <form action="Product" method="POST">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="productId" value="<%= p.getId()%>">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
             </tr>
             <%
                 }
@@ -93,8 +107,7 @@
             <input type="hidden" name="action" value="prepare-add">
             <button type="submit">Add</button>
         </form>
-
-
+        
         <!-- JS -->
         <script>
             const selectedCategoryId = '<%= request.getAttribute("category")%>';
@@ -106,7 +119,5 @@
                 selectElement.value = "";
             }
         </script>
-
-        <!-- BTVN: Viet them search by price va sort, + viet them update + delete product by id -->
     </body>
 </html>

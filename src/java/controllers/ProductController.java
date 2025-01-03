@@ -27,9 +27,11 @@ import javax.servlet.http.HttpServletResponse;
 public class ProductController extends HttpServlet {
 
     private final String LIST = "Product";
-    private final String PREPARE_CREATE = "Product?action=prepare-add";
     private final String LIST_VIEW = "view/product/list.jsp";
+    private final String PREPARE_CREATE = "Product?action=prepare-add";
     private final String CREATE_VIEW = "view/product/create.jsp";
+    private final String PREPARE_UPDATE = "Product?action=prepare-update";
+    private final String UPDATE_VIEW = "view/product/update.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -48,6 +50,15 @@ public class ProductController extends HttpServlet {
                     break;
                 case "add":
                     add(request, response, categoryDAO, productDAO);
+                    break;
+                case "prepare-update":
+                    prepareUpdate(request, response, categoryDAO, productDAO);
+                    break;
+                case "update":
+                    update(request, response, categoryDAO, productDAO);
+                    break;
+                case "delete":
+                    delete(request, response, productDAO);
                     break;
                 default:
                     list(request, response, categoryDAO, productDAO);
@@ -89,9 +100,11 @@ public class ProductController extends HttpServlet {
             Integer categoryId = null;
             Float minPrice = null;
             Float maxPrice = null;
+            
+            SearchProductDTO searchDTO = new SearchProductDTO(categoryIdRaw, productName, minPriceRaw, maxPriceRaw);
+            searchDTO.validate();
+                
             if (categoryIdRaw != null && !categoryIdRaw.isEmpty()) {
-                SearchProductDTO searchDTO = new SearchProductDTO(categoryIdRaw, productName);
-                searchDTO.validate();
                 categoryId = Integer.parseInt(categoryIdRaw);
             }
             if (minPriceRaw != null && !minPriceRaw.isEmpty()) {
@@ -148,7 +161,6 @@ public class ProductController extends HttpServlet {
                 throw new InvalidDataException("Category not found!");
             }
 
-            // call DAO
             Product product = new Product(name, Float.parseFloat(price), Integer.parseInt(productYear), image, category);
             boolean isOk = productDAO.create(product);
             if (!isOk) {
@@ -156,14 +168,71 @@ public class ProductController extends HttpServlet {
             } else {
                 response.sendRedirect(LIST);
             }
-        }
-//      catch (ValidationException ex) {
-//          request.setAttribute("validationErrors", ex.getErrors());
-//      } 
-        catch (ValidationException | InvalidDataException ex) {
+        } catch (ValidationException | InvalidDataException ex) {
             request.setAttribute("msg", ex.getMessage());
             request.getRequestDispatcher(PREPARE_CREATE).forward(request, response);
         }
+    }
+    
+    private void prepareUpdate(HttpServletRequest request, HttpServletResponse response, CategoryDAO categoryDAO, ProductDAO productDAO) throws ServletException, IOException {
+        String idRaw = request.getParameter("id");
+        try {
+            int id = Integer.parseInt(idRaw);
+            Product product = productDAO.getById(id);
+            if (product != null) {
+            List<Category> categories = categoryDAO.list();
+            request.setAttribute("categories", categories);
+            request.setAttribute("product", product);
+            request.getRequestDispatcher(UPDATE_VIEW).forward(request, response);
+            } else {
+                    throw new InvalidDataException("Product not found!");
+            }
+        } catch (NumberFormatException e) {
+            throw new InvalidDataException("Invalid product ID!");
+        }
+    }
+    
+    private void update(HttpServletRequest request, HttpServletResponse response, CategoryDAO categoryDAO, ProductDAO productDAO) throws ServletException, IOException {
+        String id = request.getParameter("id");
+        String name = request.getParameter("name");
+        String price = request.getParameter("price");
+        String productYear = request.getParameter("productYear");
+        String image = request.getParameter("image");
+        String categoryId = request.getParameter("category");
 
+        CreateProductDTO productDTO = new CreateProductDTO(name, price, productYear, image, categoryId);
+        try {
+            productDTO.validate();
+            Category category = categoryDAO.getById(Integer.parseInt(categoryId));
+            if (category == null) {
+                throw new InvalidDataException("Category not found!");
+            }
+
+            Product product = new Product(name, Float.parseFloat(price), Integer.parseInt(productYear), image, category);
+            product.setId(Integer.parseInt(id));
+            
+            boolean isOk = productDAO.update(product);
+            if (!isOk) {
+                throw new InvalidDataException("Cannot update product!");
+            }
+            response.sendRedirect(LIST);
+        } catch (ValidationException | InvalidDataException ex) {
+            request.setAttribute("msg", ex.getMessage());
+            request.getRequestDispatcher(PREPARE_UPDATE).forward(request, response);
+        }
+    }
+    
+    private void delete(HttpServletRequest request, HttpServletResponse response, ProductDAO productDAO) throws ServletException, IOException {
+        String idRaw = request.getParameter("id");
+        try {
+            int id = Integer.parseInt(idRaw);
+            boolean isOk = productDAO.delete(id);
+            if (!isOk) {
+                throw new InvalidDataException("Cannot delete product!");
+            }
+            response.sendRedirect(LIST);
+        } catch (NumberFormatException e) {
+            throw new InvalidDataException("Invalid product ID!");
+        }
     }
 }

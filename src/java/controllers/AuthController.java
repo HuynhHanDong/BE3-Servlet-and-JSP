@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServlet;
  */
 public class AuthController extends HttpServlet {
     private final String LIST = "Product";
-    private final String LIST_VIEW = "view/product/list.jsp";
     private final String LOGIN_VIEW = "view/account/login.jsp";
     
     @Override
